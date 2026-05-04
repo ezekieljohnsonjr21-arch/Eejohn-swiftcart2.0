@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swiftcart - Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+  <body class="page-shop">
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="Swiftcart Home">
+        <img src="./photos/Logo.png" alt="Swiftcart logo" class="brand-logo" />
+      </a>
+      <nav class="navbar" aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="./index.html">Home</a></li>
+          <li><a class="active" href="./shop.html">Shop</a></li>
+          <li><a href="./schedule.html">My Schedule</a></li>
+          <li><a href="./settings.html">Settings</a></li>
+        </ul>
+      </nav>
+      <button class="cart-button" id="cartBtn" aria-label="View cart">
+        <span class="cart-icon">🛒</span>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <a class="account-logo" href="./settings.html" aria-label="Account">
+        <img id="headerAvatar" src="./photos/default-avatar.png" alt="Account" class="account-avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="account-icon" style="display:none">&#128100;</span>
+      </a>
+    </header>
+
+    <main>
+      <section class="page-title">
+        <h1>Shop Local Picks</h1>
+        <p>Filter by aisle and stock up fast.</p>
+      </section>
+
+      <section class="shop-layout" aria-label="Shop products and filters">
+        <aside class="filter-panel">
+          <h2>Filters</h2>
+          <button>Fresh Today</button>
+          <button>Under $10</button>
+          <button>High Protein</button>
+          <button>Organic</button>
+          <button>Best Sellers</button>
+        </aside>
+
+        <div class="shop-grid">
+          <article class="shop-item">
+            <h3>Ground Turkey Pack</h3>
+            <p class="price">$8.99</p>
+            <button class="add-to-cart" data-name="Ground Turkey Pack" data-price="8.99">Add to Cart</button>
+          </article>
+          <article class="shop-item">
+            <h3>Strawberry Basket</h3>
+            <p class="price">$4.49</p>
+            <button class="add-to-cart" data-name="Strawberry Basket" data-price="4.49">Add to Cart</button>
+          </article>
+          <article class="shop-item">
+            <h3>Whole Grain Bread</h3>
+            <p class="price">$3.99</p>
+            <button class="add-to-cart" data-name="Whole Grain Bread" data-price="3.99">Add to Cart</button>
+          </article>
+          <article class="shop-item">
+            <h3>Spinach Bundle</h3>
+            <p class="price">$2.79</p>
+            <button class="add-to-cart" data-name="Spinach Bundle" data-price="2.79">Add to Cart</button>
+          </article>
+          <article class="shop-item">
+            <h3>Greek Yogurt Pack</h3>
+            <p class="price">$6.49</p>
+            <button class="add-to-cart" data-name="Greek Yogurt Pack" data-price="6.49">Add to Cart</button>
+          </article>
+          <article class="shop-item">
+            <h3>Atlantic Salmon Fillet</h3>
+            <p class="price">$12.99</p>
+            <button class="add-to-cart" data-name="Atlantic Salmon Fillet" data-price="12.99">Add to Cart</button>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" aria-label="Site footer">
+      <div class="footer-shell">
+        <p class="footer-brand"><span class="footer-dot" aria-hidden="true"></span> Swiftcart</p>
+        <p class="footer-copy">Copyright © 2026 Swiftcart. Fresh local shopping, simplified.</p>
+        <a class="footer-link" href="./settings.html">Manage Account</a>
+      </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+      <div class="cart-content">
+        <div class="cart-header">
+          <h2>Your Cart</h2>
+          <button class="close-cart" id="closeCart">&times;</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+          <p class="empty-cart">Your cart is empty</p>
+        </div>
+        <div class="cart-footer">
+          <div class="cart-total">
+            <span>Total:</span>
+            <span id="cartTotal">$0.00</span>
+          </div>
+          <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Cart state
+      let cart = [];
+
+      // DOM elements
+      const cartBtn = document.getElementById('cartBtn');
+      const cartModal = document.getElementById('cartModal');
+      const closeCart = document.getElementById('closeCart');
+      const cartItems = document.getElementById('cartItems');
+      const cartCount = document.getElementById('cartCount');
+      const cartTotal = document.getElementById('cartTotal');
+      const checkoutBtn = document.getElementById('checkoutBtn');
+
+      // Add to cart buttons
+      document.querySelectorAll('.add-to-cart').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const item = {
+            name: btn.dataset.name,
+            price: parseFloat(btn.dataset.price)
+          };
+          cart.push(item);
+          updateCart();
+          showAddedFeedback(btn);
+        });
+      });
+
+      // Update cart display
+      function updateCart() {
+        cartCount.textContent = cart.length;
+        
+        if (cart.length === 0) {
+          cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+        } else {
+          cartItems.innerHTML = cart.map((item, index) => `
+            <div class="cart-item">
+              <div class="cart-item-info">
+                <span class="cart-item-name">${item.name}</span>
+                <span class="cart-item-price">$${item.price.toFixed(2)}</span>
+              </div>
+              <button class="remove-item" data-index="${index}">&times;</button>
+            </div>
+          `).join('');
+          
+          // Add remove functionality
+          document.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+              cart.splice(parseInt(btn.dataset.index), 1);
+              updateCart();
+            });
+          });
+        }
+        
+        const total = cart.reduce((sum, item) => sum + item.price, 0);
+        cartTotal.textContent = '$' + total.toFixed(2);
+      }
+
+      // Show feedback when item added
+      function showAddedFeedback(btn) {
+        const originalText = btn.textContent;
+        btn.textContent = 'Added!';
+        btn.classList.add('added');
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('added');
+        }, 1000);
+      }
+
+      // Open cart modal
+      cartBtn.addEventListener('click', () => {
+        cartModal.classList.add('open');
+      });
+
+      // Close cart modal
+      closeCart.addEventListener('click', () => {
+        cartModal.classList.remove('open');
+      });
+
+      cartModal.addEventListener('click', (e) => {
+        if (e.target === cartModal) {
+          cartModal.classList.remove('open');
+        }
+      });
+
+      // Checkout
+      checkoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) {
+          alert('Your cart is empty!');
+          return;
+        }
+        const total = cart.reduce((sum, item) => sum + item.price, 0);
+        alert(`Thank you for your order!\n\nTotal: $${total.toFixed(2)}\n${cart.length} item(s)`);
+        cart = [];
+        updateCart();
+        cartModal.classList.remove('open');
+      });
+
+      // Load saved avatar
+      (function() {
+        const savedAvatar = localStorage.getItem('userAvatar');
+        const headerAvatar = document.getElementById('headerAvatar');
+        if (savedAvatar && headerAvatar) {
+          headerAvatar.src = savedAvatar;
+        }
+      })();
+    </script>
+  </body>
+</html>

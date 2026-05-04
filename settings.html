@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swiftcart - Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/main.css" />
+  </head>
+  <body class="page-settings">
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="Swiftcart Home">
+        <img src="./photos/Logo.png" alt="Swiftcart logo" class="brand-logo" />
+      </a>
+      <nav class="navbar" aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="./index.html">Home</a></li>
+          <li><a href="./shop.html">Shop</a></li>
+          <li><a href="./schedule.html">My Schedule</a></li>
+          <li><a class="active" href="./settings.html">Settings</a></li>
+        </ul>
+      </nav>
+      <a class="account-logo" href="./settings.html" aria-label="Account">
+        <img id="headerAvatar" src="./photos/default-avatar.png" alt="Account" class="account-avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="account-icon" style="display:none">&#128100;</span>
+      </a>
+    </header>
+
+    <main>
+      <section class="page-title">
+        <h1>Settings</h1>
+        <p>Manage account preferences and shopping behavior.</p>
+      </section>
+
+      <section class="settings-layout" aria-label="Settings panels">
+        <article class="settings-card profile-card">
+          <h2>Profile Picture</h2>
+          <div class="profile-section">
+            <div class="avatar-container">
+              <img id="avatarPreview" src="./photos/default-avatar.png" alt="Profile picture" class="avatar-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%2367becc%22/><circle cx=%2235%22 cy=%2240%22 r=%2212%22 fill=%22%23fff%22/><circle cx=%2270%22 cy=%2240%22 r=%2212%22 fill=%22%23fff%22/><path d=%22M30 70 Q50 85 70 70%22 stroke=%22%23fff%22 stroke-width=%223%22 fill=%22none%22/></svg>'">
+            </div>
+            <div class="profile-actions">
+              <label for="avatarInput" class="upload-btn">Choose Photo</label>
+              <input type="file" id="avatarInput" accept="image/*" hidden>
+              <button id="removeAvatar" class="remove-btn">Remove</button>
+            </div>
+            <p class="avatar-hint">JPG, PNG or GIF. Max 5MB.</p>
+          </div>
+        </article>
+
+        <article class="settings-card">
+          <h2>Notifications</h2>
+          <label><input type="checkbox" checked /> Delivery updates</label>
+          <label><input type="checkbox" checked /> Weekly deals</label>
+          <label><input type="checkbox" /> SMS alerts</label>
+        </article>
+
+        <article class="settings-card">
+          <h2>Preferences</h2>
+          <label><input type="checkbox" checked /> Show local stores first</label>
+          <label><input type="checkbox" /> Auto-reorder staples</label>
+          <label><input type="checkbox" checked /> Save payment methods</label>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const avatarInput = document.getElementById('avatarInput');
+      const avatarPreview = document.getElementById('avatarPreview');
+      const removeAvatar = document.getElementById('removeAvatar');
+
+      // Load saved avatar from localStorage
+      const savedAvatar = localStorage.getItem('userAvatar');
+      if (savedAvatar) {
+        avatarPreview.src = savedAvatar;
+      }
+
+      // Handle file selection
+      avatarInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('File too large. Maximum size is 5MB.');
+          return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert('Please select an image file.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() {
+            // Save to localStorage
+            localStorage.setItem('userAvatar', event.target.result);
+            avatarPreview.src = event.target.result;
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Remove avatar
+      removeAvatar.addEventListener('click', function() {
+        localStorage.removeItem('userAvatar');
+        avatarPreview.src = './photos/default-avatar.png';
+        avatarInput.value = '';
+        
+        // Update header avatar
+        const headerAvatar = document.getElementById('headerAvatar');
+        if (headerAvatar) {
+          headerAvatar.src = './photos/default-avatar.png';
+        }
+      });
+
+      // Load saved avatar into header on page load
+      (function() {
+        const savedAvatar = localStorage.getItem('userAvatar');
+        const headerAvatar = document.getElementById('headerAvatar');
+        if (savedAvatar && headerAvatar) {
+          headerAvatar.src = savedAvatar;
+        }
+      })();
+    </script>
+
+    <footer class="site-footer" aria-label="Site footer">
+      <div class="footer-shell">
+        <p class="footer-brand"><span class="footer-dot" aria-hidden="true"></span> Swiftcart</p>
+        <p class="footer-copy">Copyright © 2026 Swiftcart. Fresh local shopping, simplified.</p>
+        <a class="footer-link" href="./settings.html">Manage Account</a>
+      </div>
+    </footer>
+  </body>
+</html>
